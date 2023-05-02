@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from core import models, serializer, behavior as bv
@@ -17,13 +17,37 @@ class AcaoDeCorrecaoViewSet(viewsets.ModelViewSet):
 class ConjuntoDeDados(viewsets.ModelViewSet):
     serializer_class = serializer.ConjuntoDeDadosSerializer
 
-    def create_conjunto_de_dados(self, request, *args, **kwargs):
-        conjunto_de_dados = models.ConjuntoDeDados(
-            dados=request.data['dados'],
-            regras=models.Regra.objects.get(pk=request.data['regras']),
-            acao_correcao=models.AcaoDeCorrecao.objects.get(pk=request.data['acao_de_correcao'])
-        )
-        behavior = bv.ExecutarRegraEAplicarAcao()
-        resultado = behavior.run(conjunto_de_dados.dados, conjunto_de_dados.regras, conjunto_de_dados.acao_correcao)
+    def create(self, request, *args, **kwargs):
+        dados = request.data.get('dados', None)
+        regras_ids = request.data.get('regras', None)
+        acao_correcoes_id = request.data.get('acao_correcao', None)
 
+        # Verifica se o campo 'dados' está presente nos dados recebidos
+        if dados is None:
+            return Response({'error': 'O campo "dados" é obrigatório.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        regras = None
+        if regras_ids is not None:
+            try:
+                regras = models.Regra.objects.filter(pk__in=regras_ids)
+            except models.Regra.DoesNotExist:
+                return Response({'error': f'Algumas das regras informadas não existem.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        acao_correcoes = None
+        if acao_correcoes_id is not None:
+            try:
+                acao_correcoes = models.AcaoDeCorrecao.objects.filter(pk__in=acao_correcoes_id)
+            except models.AcaoDeCorrecao.DoesNotExist:
+                return Response({'error': f'Algumas das a informadas não existem.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        conjunto_de_dados = models.ConjuntoDeDados(
+            dados=dados,
+            regras=regras,
+            acao_correcao=acao_correcoes
+        )
+
+        behavior = bv.ExecutarRegra()
+        resultado = behavior.run(conjunto_de_dados.dados, conjunto_de_dados.regras, conjunto_de_dados.acao_correcao)
         return Response({'resultado': resultado})

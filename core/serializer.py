@@ -16,5 +16,7 @@ class AcaoDeCorecaoSerializer(serializers.ModelSerializer):
 
 class ConjuntoDeDadosSerializer(serializers.Serializer):
     dados = serializers.ListField()
-    regras = RegraSerializer()
-    acao_correcao = AcaoDeCorrecao()
+    regras = serializers.PrimaryKeyRelatedField(queryset=Regra.objects.all(), required=False, allow_null=True,
+                                                many=True)
+    acao_correcao = serializers.PrimaryKeyRelatedField(queryset=AcaoDeCorrecao.objects.all(), required=False,
+                                                       allow_null=True, many=True)
