@@ -1,5 +1,8 @@
+import os
+import re
 from typing import List
 
+import autopep8 as autopep8
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -105,3 +108,35 @@ class ConjuntoDeDados:
         self.dados = dados
         self.regras = regras
         self.acao_correcao = acao_correcao
+
+
+class EscritaArquivo:
+    def __init__(self, nome_arquivo):
+        self.nome_arquivo = nome_arquivo
+
+    def escrever_arquivo(self, conteudo):
+        with open(self.nome_arquivo, 'a') as arquivo:
+            arquivo.write(conteudo)
+
+
+class EscritaScript:
+    def __init__(self, tipo_arquivo):
+        self.tipo_arquivo = tipo_arquivo
+        nome_arquivo = f"{tipo_arquivo}.py".lower()
+        diretorio = 'arquivos'
+        self.arquivo = os.path.join(diretorio, nome_arquivo)
+        self.escrita_arquivo = EscritaArquivo(self.arquivo)
+
+    def criar_funcao(self, regra: Regra):
+        conteudo = autopep8.fix_code(regra.script)
+        self.escrita_arquivo.escrever_arquivo(conteudo)
+
+    def __existe_funcao(self, nome_funcao):
+        with open(self.arquivo, 'r') as arquivo:
+            conteudo = arquivo.read()
+            padrao_funcao = fr"def {nome_funcao}\(\):"
+            match = re.search(padrao_funcao, conteudo)
+            return match is not None
+
+    def __get_nome(self, regra: Regra):
+        pass
