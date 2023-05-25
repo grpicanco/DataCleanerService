@@ -1,8 +1,5 @@
-import os
-import re
 from typing import List
 
-import autopep8 as autopep8
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -15,7 +12,7 @@ class NullCharField(models.CharField):
 
 
 class ModelBase(models.Model):
-    id = models.IntegerField(
+    id = models.BigAutoField(
         db_column='id',
         primary_key=True
     )
@@ -34,12 +31,16 @@ class ModelBase(models.Model):
         verbose_name=_('Modificado em')
     )
 
+    class Meta:
+        abstract = True
+
 
 class Tipo(models.TextChoices):
-    NUM = 'NUM', _('Numérico')
+    INT = 'INT', _('Numérico Inteiro')
     TXT = 'TXT', _('Texto')
     DAT = 'DAT', _('Data')
     MOE = 'MOE', _('Moeda')
+    DEC = 'DEC', _('Decimal')
 
 
 # Create your models here.
@@ -72,6 +73,11 @@ class Regra(ModelBase):
         verbose_name=_('Script')
     )
 
+    class Meta:
+        db_table = 'regra'
+        ordering = ['id']
+        verbose_name = _('Regras')
+
 
 class AcaoDeCorrecao(ModelBase):
     titulo = models.CharField(
@@ -102,41 +108,14 @@ class AcaoDeCorrecao(ModelBase):
         verbose_name=_('Script')
     )
 
+    class Meta:
+        db_table = 'acao_de_correcao'
+        ordering = ['id']
+        verbose_name = _('Ações de Correções')
+
 
 class ConjuntoDeDados:
-    def __init__(self, dados: List, regras: List[Regra], acao_correcao: List[AcaoDeCorrecao]):
+    def __init__(self, dados: List, regras: List[Regra], acoes_correcoes: List[AcaoDeCorrecao]):
         self.dados = dados
         self.regras = regras
-        self.acao_correcao = acao_correcao
-
-
-class EscritaArquivo:
-    def __init__(self, nome_arquivo):
-        self.nome_arquivo = nome_arquivo
-
-    def escrever_arquivo(self, conteudo):
-        with open(self.nome_arquivo, 'a') as arquivo:
-            arquivo.write(conteudo)
-
-
-class EscritaScript:
-    def __init__(self, tipo_arquivo):
-        self.tipo_arquivo = tipo_arquivo
-        nome_arquivo = f"{tipo_arquivo}.py".lower()
-        diretorio = 'arquivos'
-        self.arquivo = os.path.join(diretorio, nome_arquivo)
-        self.escrita_arquivo = EscritaArquivo(self.arquivo)
-
-    def criar_funcao(self, regra: Regra):
-        conteudo = autopep8.fix_code(regra.script)
-        self.escrita_arquivo.escrever_arquivo(conteudo)
-
-    def __existe_funcao(self, nome_funcao):
-        with open(self.arquivo, 'r') as arquivo:
-            conteudo = arquivo.read()
-            padrao_funcao = fr"def {nome_funcao}\(\):"
-            match = re.search(padrao_funcao, conteudo)
-            return match is not None
-
-    def __get_nome(self, regra: Regra):
-        pass
+        self.acoes_correcoes = acoes_correcoes

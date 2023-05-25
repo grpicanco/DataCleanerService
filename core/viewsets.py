@@ -1,22 +1,11 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from core import models, serializer, behavior as bv
-from core.models import EscritaScript
 
 
 class RegraViewSet(viewsets.ModelViewSet):
     queryset = models.Regra.objects.all()
     serializer_class = serializer.RegraSerializer
-
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        if response.status_code == 201:
-            nova_regra = models.Regra.objects.get(pk=response.data['id'])
-            tipo_descricao = nova_regra.get_tipo_display()
-            escrita_script = EscritaScript(tipo_descricao)
-            escrita_script.criar_funcao(nova_regra)
-
-        return response
 
 
 class AcaoDeCorrecaoViewSet(viewsets.ModelViewSet):
@@ -55,9 +44,9 @@ class ConjuntoDeDados(viewsets.ModelViewSet):
         conjunto_de_dados = models.ConjuntoDeDados(
             dados=dados,
             regras=regras,
-            acao_correcao=acao_correcoes
+            acoes_correcoes=acao_correcoes
         )
 
-        behavior = bv.ExecutarRegra()
+        behavior = bv.ExecutarLimpeza()
         resultado = behavior.run(conjunto_de_dados)
         return Response({'resultado': resultado})
