@@ -30,6 +30,14 @@ class ModelBase(models.Model):
         blank=True,
         verbose_name=_('Modificado em')
     )
+    codigo = models.CharField(
+        db_column='txt_codigo',
+        blank=True,
+        null=False,
+        verbose_name=_('Código'),
+        max_length=6,
+        unique=True
+    )
 
     class Meta:
         abstract = True
@@ -41,6 +49,8 @@ class Tipo(models.TextChoices):
     DAT = 'DAT', _('Data')
     MOE = 'MOE', _('Moeda')
     DEC = 'DEC', _('Decimal')
+    POR = 'POR', _('Porcentagem')
+    HOR = 'HOR', _('Hora')
 
 
 # Create your models here.
