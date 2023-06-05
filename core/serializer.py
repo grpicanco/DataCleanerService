@@ -16,7 +16,19 @@ class AcaoDeCorecaoSerializer(serializers.HyperlinkedModelSerializer):
 
 class ConjuntoDeDadosSerializer(serializers.Serializer):
     dados = serializers.ListField()
-    regras = serializers.PrimaryKeyRelatedField(queryset=Regra.objects.all(), required=False, allow_null=True,
-                                                many=True)
-    acao_correcao = serializers.PrimaryKeyRelatedField(queryset=AcaoDeCorrecao.objects.all(), required=False,
-                                                       allow_null=True, many=True)
+    regras = serializers.HyperlinkedRelatedField(
+        queryset=Regra.objects.all(),
+        required=False,
+        allow_null=True,
+        many=True,
+        read_only=False,
+        view_name='RegraViewSet',
+    )
+    acao_correcao = serializers.HyperlinkedRelatedField(
+        queryset=AcaoDeCorrecao.objects.all(),
+        required=False,
+        allow_null=True,
+        many=True,
+        read_only=False,
+        view_name='AcaoDeCorrecaoViewSet',
+    )

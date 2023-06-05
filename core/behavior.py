@@ -79,7 +79,10 @@ class ExecutarLimpeza:
         if conjunto_de_dados.acoes_correcoes:
             corrigido, nao_corrigido = ExecutarLimpeza.__aplica_acao_de_correcao(errado, conjunto_de_dados)
 
-        dados = correto + corrigido + nao_corrigido
+        if conjunto_de_dados.regras or conjunto_de_dados.acoes_correcoes:
+            dados = correto + corrigido + nao_corrigido
+        else:
+            dados = conjunto_de_dados.dados
 
         values = {
             'correto': correto,

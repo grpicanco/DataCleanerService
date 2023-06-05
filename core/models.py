@@ -31,7 +31,7 @@ class ModelBase(models.Model):
         verbose_name=_('Modificado em')
     )
     codigo = models.CharField(
-        db_column='txt_codigo',
+        db_column='tx_codigo',
         blank=True,
         null=False,
         verbose_name=_('Código'),
@@ -86,7 +86,8 @@ class Regra(ModelBase):
     class Meta:
         db_table = 'regra'
         ordering = ['id']
-        verbose_name = _('Regras')
+        verbose_name = _('Regra')
+        verbose_name_plural = _('Regras')
 
 
 class AcaoDeCorrecao(ModelBase):
@@ -121,7 +122,9 @@ class AcaoDeCorrecao(ModelBase):
     class Meta:
         db_table = 'acao_de_correcao'
         ordering = ['id']
-        verbose_name = _('Ações de Correções')
+        verbose_name = _('Ação de Correção')
+        verbose_name_plural = _('Ações de Correção')
+
 
 
 class ConjuntoDeDados:
