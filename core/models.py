@@ -126,7 +126,6 @@ class AcaoDeCorrecao(ModelBase):
         verbose_name_plural = _('Ações de Correção')
 
 
-
 class ConjuntoDeDados:
     def __init__(self, dados: List, regras: List[Regra], acoes_correcoes: List[AcaoDeCorrecao]):
         self.dados = dados

@@ -40,6 +40,10 @@ class ExecutarLimpeza:
             (value_correto, value_errado) = ExecutarLimpeza.__regras(regra=regra, dados=conjunto_de_dados.dados)
             correto.extend(value_correto)
             errado.extend(value_errado)
+
+            if len(conjunto_de_dados.regras) > 1:
+                valores_a_remover = {item[0] for item in correto if item[0] is not None}
+                errado = [item for item in conjunto_de_dados.dados if item[0] not in valores_a_remover]
         return correto, errado
 
     @staticmethod
